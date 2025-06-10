@@ -12,4 +12,4 @@ class Address(BaseModel):
         alias="postalCode",
         pattern="^([ABCEGHJKLMNPRSTVXY][0-9][A-Z](?: [0-9][A-Z][0-9])?)$",
     )
-    country: str = Field(..., pattern="^^[A-Za-z\s.-]+$")
+    country: str = Field(..., pattern="^[A-Za-z\s.-]+$")

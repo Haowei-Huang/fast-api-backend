@@ -27,6 +27,7 @@ class DatabaseManager:
             )
         self.connection = None
         self.is_initialized = False
+        self.initializer = None
         self._initialization_lock = asyncio.Lock()
 
     # initialize the database connection, if not initialized, initialize it

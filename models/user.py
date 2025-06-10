@@ -1,7 +1,7 @@
 from bson import ObjectId
-from pydantic import BaseModel, Field, EmailStr, BeforeValidator
+from pydantic import BaseModel, Field, EmailStr
 from .user_role import UserRole
-from typing import List, Optional
+from typing import Optional
 from models.address import Address
 
 BaseModel.model_config["json_encoders"] = {ObjectId: lambda v: str(v)}
@@ -22,12 +22,6 @@ class CardInfo(BaseModel):
     )
     cvv: str = Field(..., pattern="^[0-9]{3}$")
     address: Address
-
-
-def ensure_object_id(value) -> ObjectId:
-    if not ObjectId.is_valid(value):
-        return ObjectId(value)
-    return value
 
 
 class User(BaseModel):

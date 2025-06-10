@@ -13,18 +13,19 @@ class UserRepositoryMongoDB(IUserRepository):
 
     async def get_by_email(self, email: str) -> Optional[User]:
         user = await self.user_collection.find_one({"email": email})
-        return user
+        return User(**user) if user else None
 
     async def get_by_id(self, user_id: str) -> Optional[User]:
         user = await self.user_collection.find_one({"_id": ObjectId(user_id)})
-        return user
+        return User(**user) if user else None
 
     async def create_user(self, user: User) -> Optional[str]:
         response = await self.user_collection.insert_one(user.model_dump())
         return str(response.inserted_id)
 
     async def find_all(self) -> List[User]:
-        return await self.user_collection.find().to_list()
+        raw_documents = await self.user_collection.find().to_list(None)
+        return [User(**doc) for doc in raw_documents]
 
     async def delete(self, user_id: str) -> int:
         response = await self.user_collection.delete_one({"_id": ObjectId(user_id)})
