@@ -1,2 +1,2 @@
-# Auto detect text files and perform LF normalization
+pip install "fastapi[standard]"# Auto detect text files and perform LF normalization
 * text=auto
