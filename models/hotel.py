@@ -15,9 +15,9 @@ class Room(BaseModel):
     description: str = Field(..., max_length=50)
     is_active: bool = Field(default=True, alias="isActive")
     type: str = Field(..., max_length=20)
-    base_rate: float = Field(..., alias="baseRate")
+    base_rate: float = Field(..., alias="baseRate", gt=0)
     bed_options: str = Field(..., max_length=20, alias="bedOptions")
-    sleep_count: int = Field(..., alias="sleepsCount")
+    sleep_count: int = Field(..., alias="sleepsCount", ge=1)
     tags: list[str]
     room_id: str = Field(alias="roomId", max_length=20)
 

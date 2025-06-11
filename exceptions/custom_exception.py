@@ -16,3 +16,7 @@ class UserUpdateError(Exception):
 
 class HotelUpdateError(Exception):
     pass
+
+
+class BookingCreationError(Exception):
+    pass

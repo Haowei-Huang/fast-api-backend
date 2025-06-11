@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from config.database_manager import DatabaseManager
 from config.settings import Settings
-from routers import users, hotels
+from routers import users, hotels, bookings
 import logging
 
 
@@ -32,3 +32,4 @@ app = FastAPI(
 
 app.include_router(users.router)
 app.include_router(hotels.router)
+app.include_router(bookings.router)

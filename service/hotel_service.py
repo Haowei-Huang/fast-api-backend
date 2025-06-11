@@ -13,7 +13,10 @@ from passlib.context import CryptContext
 
 
 class HotelService:
-    def __init__(self, hotel_repository: IHotelRepository):
+    def __init__(
+        self,
+        hotel_repository: IHotelRepository,
+    ):
         self.hotel_repository = hotel_repository
 
     async def find_all(self) -> HotelListResponse:
