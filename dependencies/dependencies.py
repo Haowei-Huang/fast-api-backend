@@ -3,7 +3,9 @@ from config.settings import Settings
 from typing import Annotated
 from fastapi import Depends, Request
 from config.database_manager import DatabaseType
+from repository.hotel_repository import IHotelRepository
 from repository.user_repository import IUserRepository
+from service.hotel_service import HotelService
 from service.user_service import UserService
 
 
@@ -37,3 +39,27 @@ def get_user_service(
     user_repository: Annotated[IUserRepository, Depends(get_user_repository)],
 ) -> UserService:
     return UserService(user_repository)
+
+
+async def get_hotel_repository(
+    db: Annotated[DatabaseManager, Depends(get_db_manager)],
+) -> IHotelRepository:
+    conn = await db.get_connection()
+
+    if db.initializer is None or conn is None:
+        raise Exception("Database not initialized.")
+
+    if db.db_type == DatabaseType.MONGODB:
+        from repository.mongo.hotel_repository_mongodb import HotelRepositoryMongoDB
+
+        return HotelRepositoryMongoDB(conn)
+    else:
+        raise ValueError(
+            f"Database type {db.db_type} is not supported for hotel repository."
+        )
+
+
+def get_hotel_service(
+    hotel_repository: Annotated[IHotelRepository, Depends(get_hotel_repository)],
+) -> HotelService:
+    return HotelService(hotel_repository)
