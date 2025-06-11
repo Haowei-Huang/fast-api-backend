@@ -1,8 +1,9 @@
 from abc import ABC
 from ..user_repository import IUserRepository
-from typing import List, Optional
+from typing import Optional
 from models.user import User
 from motor.motor_asyncio import AsyncIOMotorDatabase
+
 
 class UserRepositorySQL(IUserRepository):
     def __init__(self, db):
@@ -17,7 +18,7 @@ class UserRepositorySQL(IUserRepository):
     async def create_user(self, user: User) -> Optional[str]:
         pass
 
-    async def find_all(self) -> List[User]:
+    async def find_all(self) -> list[User]:
         pass
 
     async def delete(self, user_id: str) -> int:
