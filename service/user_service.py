@@ -189,7 +189,7 @@ class UserService:
             token_in_db = RefreshTokenInDB(
                 userId=user.id,
                 token=refresh_token["token"],
-                createdAt=datetime.datetime.now(),
+                createdAt=datetime.datetime.now(datetime.timezone.utc),
                 expiredAt=refresh_token["exp"],
             )
             # store refresh token in the database

@@ -18,7 +18,7 @@ class UserRequest(BaseModel):
 
     email: EmailStr
     role: UserRole
-    password: str = Field(..., min_length=8)
+    password: str = Field(..., min_length=3)
     is_active: bool = Field(default=True, alias="isActive")
     client_info: Optional[ClientInfo] = Field(default=None, alias="clientInfo")
     card_info: Optional[CardInfo] = Field(default=None, alias="cardInfo")

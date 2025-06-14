@@ -32,7 +32,7 @@ class AuthUtils:
         """Generate a JWT access token."""
         if not expires_delta:
             exp = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(
-                seconds=10
+                minutes=15
             )
         else:
             exp = datetime.datetime.now(datetime.timezone.utc) + expires_delta

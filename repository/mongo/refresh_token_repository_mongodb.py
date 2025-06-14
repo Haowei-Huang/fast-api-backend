@@ -44,7 +44,7 @@ class RefreshTokenRepositoryMongoDB(IRefreshTokenRepository):
         return response.deleted_count
 
     async def update(self, token: str, newToken: str) -> int:
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.now(datetime.timezone.utc)
         time_delta = datetime.timedelta(hours=1)
         response = await self.refresh_token_collection.update_one(
             {"token": token},

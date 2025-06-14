@@ -63,7 +63,7 @@ async def refresh_access_token(
     return await user_service.refresh_access_token(response, refreshToken)
 
 
-@router.put(
+@router.post(
     "/updateUser/{user_id}",
     dependencies=[Depends(get_current_user)],
     response_model=UserUpdateResponse,
