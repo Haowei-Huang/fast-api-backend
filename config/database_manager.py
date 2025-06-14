@@ -1,3 +1,4 @@
+from config.auth.auth_settings import AuthSettings
 from config.settings import Settings
 from enum import Enum
 import asyncio
