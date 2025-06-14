@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import logging
 from config.settings import Settings
 from typing import Optional
+from config.auth.auth_settings import AuthSettings
 
 
 class MongoDBInitializer:
@@ -28,12 +29,39 @@ class MongoDBInitializer:
             else:
                 logging.info("Connected to database cluster.")
 
+            await self.create_expired_index(
+                collection_name="refreshTokens", field_name="expiredAt"
+            )
+
             return self.database
         except Exception as e:
             logging.info(f"Failed to connect to MongoDB: {e}")
             if self.client:
                 self.client.close()
             raise
+
+    async def create_expired_index(self, collection_name: str, field_name: str):
+        try:
+            if self.database is None:
+                raise Exception("Database not initialized. Call initialize() first.")
+
+            collection = self.database[collection_name]
+            index_name = f"{field_name}_expire_index"
+
+            # the index creation is an idempotent operation in MongoDB, so it can be called multiple times without error
+            await collection.create_index(
+                keys=[(field_name, 1)],
+                name=index_name,
+                expireAfterSeconds=60,  # 60 seconds
+                background=True,  # Create index in the background
+            )
+            logging.info(
+                f"Created index {index_name} on {collection_name} for field {field_name} with expiration of 60 seconds."
+            )
+        except Exception as e:
+            logging.info(
+                f"Failed to create TTL index on {collection_name}.{field_name} in MongoDB: {e}"
+            )
 
     async def get_connection(self) -> Optional[AsyncIOMotorDatabase]:
         if self.database is None:

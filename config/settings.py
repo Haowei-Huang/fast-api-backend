@@ -2,10 +2,9 @@ from pydantic_settings import BaseSettings
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-
 
 class Settings(BaseSettings):
+    load_dotenv()
     app_name: str = "FastAPI MongoDB Backend"
     db_type: str = os.environ.get("DB_TYPE", "mongodb")
     db_name: str = os.environ.get("DB_NAME", "fastapi_db")

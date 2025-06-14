@@ -5,12 +5,22 @@ from repository.user_repository import IUserRepository
 from models.booking import Booking
 import inspect
 import logging
-from fastapi.encoders import jsonable_encoder
 from schemas.booking.response.booking_create_response import BookingCreateResponse
 from schemas.booking.response.booking_list_response import BookingListResponse
 from schemas.booking.request.booking_request import BookingRequest
-from exceptions.custom_exception import BookingCreationError
 from passlib.context import CryptContext
+from exceptions.custom_exception import (
+    BookingServiceError,
+    HotelNotFoundError,
+    NotFoundError,
+    UserNotFoundError,
+)
+from exceptions.user_identifier import UserIdentifier
+
+logging.basicConfig(
+    level=logging.INFO,  # Set the logging level to INFO or DEBUG
+    format="%(asctime)s - %(levelname)s - %(message)s",  # Format for log messages
+)
 
 
 class BookingService:
@@ -32,7 +42,8 @@ class BookingService:
             return BookingListResponse(data=bookings, error=None)
         except Exception as e:
             logging.error(f"error in {inspect.stack()[1][3]}: ", exc_info=True)
-            return BookingListResponse(data=[], error=str(e))
+            raise BookingServiceError(f"Failed to retrieve bookings: {str(e)}")
+            # return BookingListResponse(data=[], error=str(e))
 
     async def create_booking(self, req: BookingRequest) -> BookingCreateResponse:
         try:
@@ -41,33 +52,36 @@ class BookingService:
             # check if hotel exists
             hotel = await self.hotel_repository.get_by_id(req.hotel_id)
             if not hotel:
-                raise BookingCreationError(
-                    f"Hotel with id {req.hotel_id} does not exist"
-                )
+                raise HotelNotFoundError(f"Hotel with id {req.hotel_id} does not exist")
 
             # check if user exists if user_id is not empty
             if req.user_id:
                 user = await self.user_repository.get_by_id(req.user_id)
                 if not user:
-                    raise BookingCreationError(
-                        f"User with id {req.user_id} does not exist"
+                    raise UserNotFoundError(
+                        UserIdentifier.user_id,
+                        f"User with id {req.user_id} does not exist",
                     )
 
             booking = Booking(**req.model_dump(by_alias=True, exclude_unset=True))
             inserted_id = await self.booking_repository.create_booking(booking)
 
             if not inserted_id:
-                raise BookingCreationError("Failed to create booking")
+                raise BookingServiceError()
 
             # verify creation
             created_booking = await self.booking_repository.get_by_id(inserted_id)
             if not created_booking:
-                raise BookingCreationError("Failed to create booking")
+                raise BookingServiceError()
 
             return BookingCreateResponse(is_created=True, data=inserted_id, error=None)
+        except NotFoundError as e:
+            logging.error(f"error in {inspect.stack()[1][3]}: ", exc_info=True)
+            raise e
         except Exception as e:
             logging.error(f"error in {inspect.stack()[1][3]}: ", exc_info=True)
-            return BookingCreateResponse(is_created=False, data=None, error=str(e))
+            raise BookingServiceError(f"Failed to create booking: {str(e)}")
+            # return BookingCreateResponse(is_created=False, data=None, error=str(e))
 
     async def get_bookings_by_user_id(self, user_id: str) -> BookingListResponse:
         try:
@@ -76,4 +90,7 @@ class BookingService:
             return BookingListResponse(data=bookings, error=None)
         except Exception as e:
             logging.error(f"error in {inspect.stack()[1][3]}: ", exc_info=True)
-            return BookingListResponse(data=[], error=str(e))
+            raise BookingServiceError(
+                f"Failed to retrieve bookings for user {user_id}: {str(e)}"
+            )
+            # return BookingListResponse(data=[], error=str(e))
