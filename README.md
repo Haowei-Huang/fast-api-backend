@@ -1,5 +1,4 @@
-Please view the document generated for this project:
-[fast-api-backend Deep Wiki](https://deepwiki.com/Haowei-Huang/fast-api-backend)
+Feel free to read the [Deep Wiki](https://deepwiki.com/Haowei-Huang/fast-api-backend) generated for this project
 
 # FastAPI Backend for Simplibook
 
